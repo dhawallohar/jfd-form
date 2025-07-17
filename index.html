@@ -1,0 +1,208 @@
+[3:44 am, 18/7/2025] Dc: <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Granite Order Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      text…
+[3:55 am, 18/7/2025] Dc: <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Granite Order Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .form-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin: auto;
+      padding: 30px;
+      transition: all 0.3s ease;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007aff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background-color: #005ecb;
+    }
+    .size-list {
+      margin-top: 10px;
+    }
+    .size-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f1f3f5;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+    .size-item span {
+      font-size: 16px;
+    }
+    .size-item button {
+      width: auto;
+      padding: 4px 8px;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Granite Order Form</h2>
+    <form id="orderForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="tel" id="contact" placeholder="Contact Number" required />
+      <input type="text" id="address" placeholder="Address" required />
+      <input type="email" id="email" placeholder="Gmail ID" required />
+      <input type="text" id="granite" placeholder="Granite / Slab Name" required />
+
+      <div id="size-section">
+        <input type="text" id="sizeInput" placeholder="Enter Size (e.g. 4.5-6.7)" />
+        <button type="button" onclick="addSize()">Add Size</button>
+        <div class="size-list" id="sizeList"></div>
+      </div>
+
+      <button type="submit">Submit All</button>
+    </form>
+  </div>
+
+  <script>
+    let sizes = [];
+
+    function addSize() {
+      const input = document.getElementById("sizeInput");
+      const rawSize = input.value.trim();
+      if (!rawSize.match(/^\d+(\.\d+)?-\d+(\.\d+)?$/)) {
+        alert("Size format must be like 4.5-6.7");
+        return;
+      }
+      const formatted = rawSize.replace("-", "ft × ") + "ft";
+      sizes.push(formatted);
+      input.value = "";
+      renderSizes();
+    }
+
+    function renderSizes() {
+      const list = document.getElementById("sizeList");
+      list.innerHTML = "";
+      sizes.forEach((size, i) => {
+        const div = document.createElement("div");
+        div.className = "size-item";
+        div.innerHTML = `
+          <span>${size}</span>
+          <div>
+            <button onclick="editSize(${i})">Edit</button>
+            <button onclick="removeSize(${i})">Remove</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function editSize(index) {
+      const current = sizes[index].replace("ft × ", "-").replace("ft", "");
+      document.getElementById("sizeInput").value = current;
+      removeSize(index);
+    }
+
+    function removeSize(index) {
+      sizes.splice(index, 1);
+      renderSizes();
+    }
+
+    document.getElementById("orderForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const contact = document.getElementById("contact").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const granite = document.getElementById("granite").value.trim();
+
+      if (!sizes.length) {
+        alert("Please add at least one slab size.");
+        return;
+      }
+
+      const data = {
+        name,
+        contact,
+        address,
+        email,
+        granite,
+        sizes: sizes.join(", ")
+      };
+
+      // ✅ Replace below with your Google Apps Script URL:
+      const sheetURL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+      fetch(sheetURL, {
+        method: "POST",
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.text())
+        .then((msg) => {
+          alert("Form submitted successfully!");
+          document.getElementById("orderForm").reset();
+          sizes = [];
+          renderSizes();
+        })
+        .catch((err) => {
+          alert("Error: " + err);
+        });
+    });
+  </script>
+</body>
+</html>
